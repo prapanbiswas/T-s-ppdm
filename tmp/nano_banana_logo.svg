@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="neo-shadow" x="0" y="0" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feOffset dx="16" dy="16" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.07   0 0 0 0 0.07   0 0 0 0 0.07  0 0 0 1 0"/>
+      <feBlend in="SourceGraphic" in2="shadow" mode="normal" />
+    </filter>
+  </defs>
+
+  <!-- Neo-Brutalist Hard Drop Shadow for Container -->
+  <rect x="36" y="36" width="456" height="456" rx="90" fill="#121212" />
+
+  <!-- Main Container Card -->
+  <rect x="20" y="20" width="456" height="456" rx="90" fill="#FFE600" stroke="#121212" stroke-width="16" />
+
+  <!-- Decorative Neo-Brutalist Accent Shapes in Background -->
+  <!-- Sparkle / Star 1 -->
+  <path d="M100 80 L110 110 L140 120 L110 130 L100 160 L90 130 L60 120 L90 110 Z" fill="#FFFFFF" stroke="#121212" stroke-width="6" />
+  <!-- Sparkle / Star 2 -->
+  <path d="M390 350 L398 375 L420 380 L398 390 L390 415 L382 390 L360 380 L382 375 Z" fill="#6EE7B7" stroke="#121212" stroke-width="6" />
+  <!-- Small dot stickers -->
+  <circle cx="90" cy="380" r="14" fill="#C4B5FD" stroke="#121212" stroke-width="6" />
+  <circle cx="390" cy="110" r="12" fill="#FF8BA7" stroke="#121212" stroke-width="6" />
+
+  <!-- Nano Banana Mascot Group -->
+  <g transform="translate(15, 10)">
+    <!-- Banana Body Drop Shadow (Neo-brutalist offset) -->
+    <path d="M 290 85 C 275 80, 240 85, 205 130 C 160 190, 150 270, 185 345 C 215 410, 280 435, 345 405 C 385 385, 400 355, 395 340 C 390 325, 370 330, 345 345 C 300 370, 255 355, 230 310 C 205 260, 215 195, 255 145 C 285 110, 305 100, 300 85 Z"
+          fill="#121212" transform="translate(10, 12)" />
+
+    <!-- Banana Main Body -->
+    <path d="M 290 85 C 275 80, 240 85, 205 130 C 160 190, 150 270, 185 345 C 215 410, 280 435, 345 405 C 385 385, 400 355, 395 340 C 390 325, 370 330, 345 345 C 300 370, 255 355, 230 310 C 205 260, 215 195, 255 145 C 285 110, 305 100, 300 85 Z"
+          fill="#FFF04B" stroke="#121212" stroke-width="14" stroke-linejoin="round" />
+
+    <!-- Banana Outer Curve / Bottom Shadow Tone -->
+    <path d="M 185 345 C 215 410, 280 435, 345 405 C 385 385, 400 355, 395 340 C 385 350, 360 365, 330 375 C 275 390, 225 365, 195 320 Z"
+          fill="#F59E0B" opacity="0.9" />
+
+    <!-- Banana Top Stem -->
+    <path d="M 290 85 C 295 65, 305 50, 320 45 C 330 42, 335 48, 330 58 C 322 72, 312 80, 300 85 Z"
+          fill="#84CC16" stroke="#121212" stroke-width="12" stroke-linejoin="round" />
+
+    <!-- Banana Bottom Tip -->
+    <path d="M 395 340 C 402 346, 405 355, 398 362 C 392 368, 385 362, 382 355 Z"
+          fill="#121212" />
+
+    <!-- Cool Neo Sunglasses -->
+    <!-- Left Lens Frame & Shadow -->
+    <polygon points="182,205 242,185 240,235 180,245" fill="#121212" stroke="#121212" stroke-width="6" stroke-linejoin="round" />
+    <!-- Right Lens Frame & Shadow -->
+    <polygon points="252,182 312,168 310,215 250,232" fill="#121212" stroke="#121212" stroke-width="6" stroke-linejoin="round" />
+    <!-- Bridge -->
+    <rect x="238" y="196" width="18" height="10" fill="#121212" transform="rotate(-12 247 201)" />
+    <!-- Temple Arm -->
+    <line x1="184" y1="210" x2="162" y2="225" stroke="#121212" stroke-width="10" stroke-linecap="round" />
+
+    <!-- Glossy Reflection Highlights on Lenses -->
+    <polygon points="192,208 205,204 195,238 185,241" fill="#FFFFFF" />
+    <polygon points="212,202 218,200 210,234 204,236" fill="#FFFFFF" />
+    <polygon points="262,186 275,182 265,224 255,227" fill="#FFFFFF" />
+    <polygon points="282,180 288,178 280,220 274,222" fill="#FFFFFF" />
+
+    <!-- Smug / Confident Smiling Mouth -->
+    <path d="M 230 262 Q 255 285 285 260" fill="none" stroke="#121212" stroke-width="10" stroke-linecap="round" />
+    <!-- Tongue / Cheek dimple -->
+    <path d="M 245 272 Q 255 286 268 274 Z" fill="#FF6B8B" stroke="#121212" stroke-width="5" />
+    <!-- Smirk detail line -->
+    <line x1="284" y1="256" x2="292" y2="264" stroke="#121212" stroke-width="7" stroke-linecap="round" />
+
+    <!-- Tech "NANO" Lightning Spark / Badge -->
+    <g transform="translate(145, 120) rotate(-15)">
+      <polygon points="12,0 36,0 24,18 42,18 10,48 18,26 0,26" fill="#00E5FF" stroke="#121212" stroke-width="6" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- Bottom Neo-Brutalist Sticker Banner "NANO BANANA" -->
+  <g transform="translate(68, 410)">
+    <!-- Banner Drop Shadow -->
+    <rect x="6" y="6" width="340" height="52" rx="14" fill="#121212" />
+    <!-- Banner Surface -->
+    <rect x="0" y="0" width="340" height="52" rx="14" fill="#FFFFFF" stroke="#121212" stroke-width="8" />
+    <!-- Text -->
+    <text x="170" y="36" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="28" text-anchor="middle" fill="#121212" letter-spacing="3">NANO BANANA</text>
+  </g>
+</svg>

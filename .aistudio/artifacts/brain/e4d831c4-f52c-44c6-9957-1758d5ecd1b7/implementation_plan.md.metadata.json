@@ -1,0 +1,6 @@
+{
+  "summary":  "Updated implementation plan reflecting the simplified dual PDF reporting system:\n1. Individual Orders Sheet: Clean single row per order across multiple columns (Order ID, Name, Full Mobile, individual size numbers 1,2,3..., Total, Paid status, Amount, and Signature line).\n2. Manufacturing Subtotal Sheet: Crystal-clear factory garment cutting and stitching sheet with total orders combined into piece counts per size (e.g. L size: 9 pcs, M size: 6 pcs, etc.) and verification sign-offs.\n3. Combined Package (2 in 1): Generates both sheets in one unified document.",
+  "updatedAt":  "2026-10-09T04:03:06.346267821Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

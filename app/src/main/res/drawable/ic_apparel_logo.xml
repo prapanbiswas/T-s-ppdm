@@ -1,0 +1,50 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Premium Rounded Squircle Container -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M16,10 h76 c7.73,0 14,6.27 14,14 v60 c0,7.73 -6.27,14 -14,14 H16 c-7.73,0 -14,-6.27 -14,-14 V24 c0,-7.73 6.27,-14 14,-14 Z" />
+
+    <!-- Subtle Deep Accent Border -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2563EB"
+        android:strokeWidth="1.8"
+        android:pathData="M16,10 h76 c7.73,0 14,6.27 14,14 v60 c0,7.73 -6.27,14 -14,14 H16 c-7.73,0 -14,-6.27 -14,-14 V24 c0,-7.73 6.27,-14 14,-14 Z" />
+
+    <!-- Elegant Folded T-Shirt / Apparel Silhouette -->
+    <!-- Collar & Shoulders -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,26 L46,26 C48,31 60,31 62,26 L74,26 C76.5,26 78.5,28 80.5,30.5 L89,40 C90.5,41.8 89.8,44.5 87.8,45.8 L82.5,49.2 C81,50.1 79,49.6 78,48 L73.5,40.5 L73.5,78 C73.5,80.2 71.7,82 69.5,82 L38.5,82 C36.3,82 34.5,80.2 34.5,78 L34.5,40.5 L30,48 C29,49.6 27,50.1 25.5,49.2 L20.2,45.8 C18.2,44.5 17.5,41.8 19,40 L27.5,30.5 C29.5,28 31.5,26 34,26 Z" />
+
+    <!-- Stylized V-Neck / Collar Opening in Electric Blue -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M46,26 C48,34 60,34 62,26 C59,38 49,38 46,26 Z" />
+
+    <!-- Clean Vertical Stitch / Placket Line -->
+    <path
+        android:strokeColor="#E2E8F0"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,37 L54,58" />
+
+    <!-- Modern Order / Dispatch Checkmark Emblem on Chest -->
+    <path
+        android:fillColor="#059669"
+        android:pathData="M54,65 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M50,65 L53,68 L58,62" />
+
+</vector>

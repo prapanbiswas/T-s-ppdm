@@ -1,0 +1,136 @@
+name: Build and Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version Name to release (e.g. 1.1)'
+        required: false
+        default: ''
+      release_notes:
+        description: 'Release Notes (বাংলা / English)'
+        required: false
+        default: 'শারদীয় দুর্গোৎসব টি-শার্ট বিতরণ ও অর্ডার ব্যবস্থাপনা নতুন আপডেট'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+          fi
+
+      - name: Ensure Debug Keystore Exists
+        run: |
+          if [ ! -f "debug.keystore" ]; then
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Extract App Version from build.gradle.kts
+        id: get_version
+        run: |
+          VERSION_NAME=$(grep -o 'versionName = "[^"]*"' app/build.gradle.kts | cut -d'"' -f2)
+          VERSION_CODE=$(grep -o 'versionCode = [0-9]*' app/build.gradle.kts | awk '{print $3}')
+          if [ -n "${{ github.event.inputs.version_name }}" ]; then
+            VERSION_NAME="${{ github.event.inputs.version_name }}"
+          fi
+          if [ -z "$VERSION_NAME" ]; then
+            VERSION_NAME="1.0"
+          fi
+          if [ -z "$VERSION_CODE" ]; then
+            VERSION_CODE="1"
+          fi
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+          echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
+          echo "TAG_NAME=v${VERSION_NAME}" >> $GITHUB_ENV
+          echo "Building version ${VERSION_NAME} (code ${VERSION_CODE})"
+
+      - name: Compile and Assemble APKs
+        run: |
+          if [ -f "./gradlew" ]; then
+            ./gradlew assembleDebug assembleRelease --stacktrace
+          else
+            gradle assembleDebug assembleRelease --stacktrace
+          fi
+
+      - name: Prepare Signed Release Artifacts
+        run: |
+          mkdir -p release-output
+          # Look for generated APKs
+          TARGET_APK="release-output/PodderparaDurgaMandir-v${{ env.VERSION_NAME }}.apk"
+          
+          if [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            # Sign unsigned release APK with debug key so it is directly installable on devices
+            jarsigner -verbose -keystore debug.keystore -storepass android -keypass android app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey
+            cp app/build/outputs/apk/release/app-release-unsigned.apk "$TARGET_APK"
+          elif [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            cp app/build/outputs/apk/release/app-release.apk "$TARGET_APK"
+          elif [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk "$TARGET_APK"
+          fi
+
+          # Also create a canonical app-release.apk for consistent download link
+          cp "$TARGET_APK" release-output/app-release.apk
+
+          # Generate version.json for the in-app auto-update checker
+          cat <<EOF > release-output/version.json
+          {
+            "versionCode": ${{ env.VERSION_CODE }},
+            "versionName": "${{ env.VERSION_NAME }}",
+            "tag": "${{ env.TAG_NAME }}",
+            "downloadUrl": "https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/PodderparaDurgaMandir-v${{ env.VERSION_NAME }}.apk",
+            "releaseNotes": "শারদীয় দুর্গোৎসব টি-শার্ট বিতরণ ও অর্ডার ব্যবস্থাপনা v${{ env.VERSION_NAME }}",
+            "updatedAt": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: "রিলিজ ${{ env.TAG_NAME }} (v${{ env.VERSION_NAME }})"
+          body: |
+            ## পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির — টি-শার্ট বিতরণ ও অর্ডার ব্যবস্থাপনা
+            **বর্তমান সংস্করণ:** v${{ env.VERSION_NAME }} (বিল্ড ${{ env.VERSION_CODE }})
+            
+            ### 📲 সরাসরি APK ডাউনলোড ও ইনস্টল
+            - **[PodderparaDurgaMandir-v${{ env.VERSION_NAME }}.apk](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/PodderparaDurgaMandir-v${{ env.VERSION_NAME }}.apk)** (অ্যান্ড্রয়েড ফোনের জন্য প্রস্তুত)
+            
+            ### 🚀 নতুন সুবিধাসমূহ
+            - গ্রাহক অর্ডার তালিকা ও কারখানা সাইজ সাবটোটাল শীট
+            - অ্যাপের স্বয়ংক্রিয় আপডেট ও সরাসরি ইনস্টলেশন সুবিধা
+            - ক্লাউড ব্যাকআপ ও এসএমএস গেটওয়ে ইন্টিগ্রেশন
+          draft: false
+          prerelease: false
+          files: |
+            release-output/PodderparaDurgaMandir-v${{ env.VERSION_NAME }}.apk
+            release-output/app-release.apk
+            release-output/version.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

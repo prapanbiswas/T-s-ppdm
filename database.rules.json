@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "orders": {
+      ".read": true,
+      ".write": true,
+      "$orderId": {
+        ".validate": "newData.hasChildren(['serialNumber', 'customerName', 'mobileNumber'])"
+      }
+    },
+    "tshirt_orders": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

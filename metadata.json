@@ -1,0 +1,6 @@
+{
+  "name": "পোদ্দারপাড়া দুর্গা মন্দির",
+  "description": "পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির এর টি-শার্ট বিতরণ, SMS ট্র্যাকিং ও অর্ডার ব্যবস্থাপনা অ্যাপ।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
