@@ -39,11 +39,6 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          log-accepted-android-sdk-licenses: false
-
       - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -52,11 +47,27 @@ jobs:
 
       - name: Accept Android SDK Licenses & Prepare Environment
         run: |
-          yes | sdkmanager --licenses 2>/dev/null || true
-          touch .env
-          if [ ! -f "debug.keystore" ] && [ -f "debug.keystore.base64" ]; then
-            base64 -d debug.keystore.base64 > debug.keystore
+          # Use pre-installed Android SDK on GitHub runner
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          if command -v sdkmanager &> /dev/null; then
+            yes | sdkmanager --licenses 2>/dev/null || true
+          elif [ -n "$ANDROID_HOME" ] && [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses 2>/dev/null || true
           fi
+          
+          # Create placeholder .env for secrets plugin
+          touch .env
+          
+          # Restore debug.keystore if base64 file exists, or generate one
+          if [ ! -f "debug.keystore" ]; then
+            if [ -f "debug.keystore.base64" ]; then
+              base64 -d debug.keystore.base64 > debug.keystore
+            else
+              keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            fi
+          fi
+          
+          # Ensure gradlew executable permissions
           if [ -f "./gradlew" ]; then
             chmod +x ./gradlew
           fi
