@@ -78,6 +78,8 @@ import com.example.ui.OrderViewModel
 import com.example.ui.components.NetworkStatusBar
 import com.example.ui.components.NetworkStatusBadge
 import com.example.ui.components.AppUpdateDialog
+import com.example.ui.components.EditOrderDialog
+import com.example.ui.components.OrderPlacedCelebrationDialog
 import com.example.ui.components.SettingsDialog
 import com.example.ui.components.SleekBrandHeader
 import com.example.update.AppUpdateManager
@@ -133,6 +135,8 @@ class MainActivity : ComponentActivity() {
                 val selectedSimId by viewModel.selectedSimId.collectAsStateWithLifecycle()
                 val availableSimCards by viewModel.availableSimCards.collectAsStateWithLifecycle()
                 val formState by viewModel.formState.collectAsStateWithLifecycle()
+                val editingOrder by viewModel.editingOrder.collectAsStateWithLifecycle()
+                val celebrationOrder by viewModel.celebrationOrder.collectAsStateWithLifecycle()
                 val updateStatus by AppUpdateManager.updateStatus.collectAsStateWithLifecycle()
 
                 // Check for updates on startup
@@ -351,13 +355,13 @@ class MainActivity : ComponentActivity() {
                                     NewOrderScreen(
                                         viewModel = viewModel,
                                         onOrderPlaced = { orderId ->
+                                            // Do not redirect to ALL_ORDERS tab - keep user on New Order screen
                                             scope.launch {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "Order #$orderId placed & tracking dispatched!",
+                                                    message = "অর্ডার #$orderId সফলভাবে সম্পন্ন হয়েছে!",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             }
-                                            currentTab = AppTab.ALL_ORDERS
                                         }
                                     )
                                 }
@@ -397,6 +401,23 @@ class MainActivity : ComponentActivity() {
                     AppUpdateDialog(
                         status = updateStatus,
                         onDismiss = { AppUpdateManager.dismissUpdate() }
+                    )
+                }
+
+                // Edit Order Dialog (available globally from any screen)
+                editingOrder?.let { order ->
+                    EditOrderDialog(
+                        order = order,
+                        onSave = { updated -> viewModel.saveEditedOrder(updated) },
+                        onDismiss = { viewModel.dismissEditingOrder() }
+                    )
+                }
+
+                // Animated Order Placed Celebration Dialog with tick animation & live SMS tracking
+                celebrationOrder?.let { order ->
+                    OrderPlacedCelebrationDialog(
+                        order = order,
+                        onDismiss = { viewModel.dismissCelebration() }
                     )
                 }
             }

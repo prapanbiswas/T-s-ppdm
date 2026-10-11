@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#A83216"/>
+      <stop offset="60%" stop-color="#942911"/>
+      <stop offset="100%" stop-color="#651806"/>
+    </radialGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="35%" stop-color="#F59E0B"/>
+      <stop offset="70%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="50%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="clothGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" mode="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base with Rounded Squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)"/>
+  
+  <!-- Outer Decorative Ring -->
+  <rect x="24" y="24" width="464" height="464" rx="100" fill="none" stroke="url(#goldGrad)" stroke-width="6"/>
+  <rect x="36" y="36" width="440" height="440" rx="88" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-opacity="0.6"/>
+
+  <!-- Inner Sacred Rangoli Circle -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-dasharray="14 8"/>
+  <circle cx="256" cy="256" r="198" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-opacity="0.4"/>
+
+  <!-- Corner Lotus Floral Filigrees -->
+  <!-- Top-Left -->
+  <circle cx="68" cy="68" r="8" fill="url(#goldLight)"/>
+  <!-- Top-Right -->
+  <circle cx="444" cy="68" r="8" fill="url(#goldLight)"/>
+  <!-- Bottom-Left -->
+  <circle cx="68" cy="444" r="8" fill="url(#goldLight)"/>
+  <!-- Bottom-Right -->
+  <circle cx="444" cy="444" r="8" fill="url(#goldLight)"/>
+
+  <!-- Sunburst Radiance from Center (Puja Aura) -->
+  <g stroke="url(#goldGrad)" stroke-width="2" stroke-opacity="0.35" stroke-linecap="round">
+    <line x1="256" y1="65" x2="256" y2="95"/>
+    <line x1="256" y1="417" x2="256" y2="447"/>
+    <line x1="65" y1="256" x2="95" y2="256"/>
+    <line x1="417" y1="256" x2="447" y2="256"/>
+    <line x1="122" y1="122" x2="144" y2="144"/>
+    <line x1="390" y1="122" x2="368" y2="144"/>
+    <line x1="122" y1="390" x2="144" y2="368"/>
+    <line x1="390" y1="390" x2="368" y2="368"/>
+  </g>
+
+  <!-- Modern Apparel / T-Shirt Silhouette Base (Representing the Orders) -->
+  <path d="M 180,310 
+           L 215,310 
+           C 225,328 287,328 297,310 
+           L 332,310 
+           C 344,310 354,318 360,328 
+           L 388,368 
+           C 394,376 391,388 382,394 
+           L 358,408 
+           C 350,412 342,410 336,402 
+           L 322,382 
+           L 322,436 
+           C 322,446 314,454 304,454 
+           L 208,454 
+           C 198,454 190,446 190,436 
+           L 190,382 
+           L 176,402 
+           C 170,410 162,412 154,408 
+           L 130,394 
+           C 121,388 118,376 124,368 
+           L 152,328 
+           C 158,318 168,310 180,310 Z" 
+        fill="url(#clothGrad)" 
+        stroke="url(#goldGrad)" 
+        stroke-width="5"/>
+
+  <!-- T-Shirt V-Neck / Collar Accent in Gold -->
+  <path d="M 215,310 C 225,338 287,338 297,310 C 282,352 230,352 215,310 Z" fill="url(#goldGrad)"/>
+
+  <!-- Center Placket Stitch Line -->
+  <line x1="256" y1="338" x2="256" y2="400" stroke="#CBD5E1" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Verification Check Badge on Shirt (Order Dispatch Completed) -->
+  <circle cx="256" cy="422" r="18" fill="#059669" stroke="#FFFFFF" stroke-width="2.5"/>
+  <path d="M 248,422 L 254,428 L 265,416" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Divine Trishul (Sacred Trident of Maa Durga) -->
+  <!-- Central Spear Blade -->
+  <path d="M 256,70 
+           C 252,90 244,125 244,160 
+           C 244,185 252,205 256,220 
+           C 260,205 268,185 268,160 
+           C 268,125 260,90 256,70 Z" 
+        fill="url(#goldLight)" 
+        stroke="#92400E" 
+        stroke-width="2"/>
+  
+  <!-- Spear Center Spine Ridge -->
+  <line x1="256" y1="75" x2="256" y2="215" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Left Crescent Blade of Trishul -->
+  <path d="M 244,175 
+           C 225,170 185,150 178,105 
+           C 174,80 186,85 190,95 
+           C 198,120 220,150 242,158 Z" 
+        fill="url(#goldGrad)" 
+        stroke="#92400E" 
+        stroke-width="2"/>
+
+  <!-- Right Crescent Blade of Trishul -->
+  <path d="M 268,175 
+           C 287,170 327,150 334,105 
+           C 338,80 326,85 322,95 
+           C 314,120 292,150 270,158 Z" 
+        fill="url(#goldGrad)" 
+        stroke="#92400E" 
+        stroke-width="2"/>
+
+  <!-- Trishul Golden Collar / Damru Mount -->
+  <rect x="238" y="216" width="36" height="12" rx="4" fill="url(#goldLight)" stroke="#92400E" stroke-width="1.5"/>
+  <circle cx="256" cy="222" r="4" fill="#942911"/>
+
+  <!-- Trishul Shaft descending through Maa Durga's Third Eye -->
+  <rect x="252" y="228" width="8" height="65" rx="3" fill="url(#goldGrad)" stroke="#78350F" stroke-width="1"/>
+
+  <!-- Sacred Trinayan (Maa Durga's Auspicious Third Eye) -->
+  <path d="M 256,240 
+           C 246,252 246,268 256,280 
+           C 266,268 266,252 256,240 Z" 
+        fill="#FFFFFF" 
+        stroke="url(#goldGrad)" 
+        stroke-width="2.5"/>
+  <circle cx="256" cy="260" r="6" fill="#942911"/>
+  <circle cx="256" cy="260" r="2.5" fill="url(#goldLight)"/>
+
+  <!-- Flanking Divine Eyes (পদ্মপলাশলোচন) -->
+  <!-- Left Eye -->
+  <path d="M 200,266 C 215,252 235,254 242,266 C 235,278 215,276 200,266 Z" 
+        fill="#FFFFFF" stroke="url(#goldGrad)" stroke-width="2"/>
+  <circle cx="222" cy="266" r="4.5" fill="#1E293B"/>
+  <circle cx="223.5" cy="264.5" r="1.5" fill="#FFFFFF"/>
+  <!-- Left Eyebrow -->
+  <path d="M 198,256 C 214,244 234,248 242,258" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Right Eye -->
+  <path d="M 312,266 C 297,252 277,254 270,266 C 277,278 297,276 312,266 Z" 
+        fill="#FFFFFF" stroke="url(#goldGrad)" stroke-width="2"/>
+  <circle cx="290" cy="266" r="4.5" fill="#1E293B"/>
+  <circle cx="288.5" cy="264.5" r="1.5" fill="#FFFFFF"/>
+  <!-- Right Eyebrow -->
+  <path d="M 314,256 C 298,244 278,248 270,258" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Sacred Vermillion Tilak on Forehead -->
+  <path d="M 256,228 C 253,233 253,237 256,240 C 259,237 259,233 256,228 Z" fill="#DC2626"/>
+
+  <!-- Flanking Sacred Lotus Flowers (পদ্ম) -->
+  <!-- Left Lotus -->
+  <g transform="translate(100, 260) scale(0.65)">
+    <path d="M 40,50 C 10,20 10,-20 40,-35 C 70,-20 70,20 40,50 Z" fill="#F43F5E"/>
+    <path d="M 40,50 C -10,30 -25,-5 0,-25 C 20,-10 30,20 40,50 Z" fill="#FB7185"/>
+    <path d="M 40,50 C 90,30 105,-5 80,-25 C 60,-10 50,20 40,50 Z" fill="#FB7185"/>
+    <circle cx="40" cy="40" r="8" fill="url(#goldLight)"/>
+  </g>
+
+  <!-- Right Lotus -->
+  <g transform="translate(360, 260) scale(0.65)">
+    <path d="M 40,50 C 10,20 10,-20 40,-35 C 70,-20 70,20 40,50 Z" fill="#F43F5E"/>
+    <path d="M 40,50 C -10,30 -25,-5 0,-25 C 20,-10 30,20 40,50 Z" fill="#FB7185"/>
+    <path d="M 40,50 C 90,30 105,-5 80,-25 C 60,-10 50,20 40,50 Z" fill="#FB7185"/>
+    <circle cx="40" cy="40" r="8" fill="url(#goldLight)"/>
+  </g>
+
+</svg>

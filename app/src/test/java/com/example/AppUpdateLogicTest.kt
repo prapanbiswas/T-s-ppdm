@@ -12,10 +12,10 @@ import java.io.File
 class AppUpdateLogicTest {
 
     @Test
-    fun testCurrentAppVersionIsOnePointZero() {
-        // User requirement: The current version of the app will be 1.0
-        assertEquals("1.0", AppUpdateManager.CURRENT_VERSION_NAME)
-        assertEquals(1, AppUpdateManager.CURRENT_VERSION_CODE)
+    fun testCurrentAppVersionIsUpdated() {
+        // App version set to v1.1 per user requirement
+        assertEquals("1.1", AppUpdateManager.CURRENT_VERSION_NAME)
+        assertEquals(2, AppUpdateManager.CURRENT_VERSION_CODE)
     }
 
     @Test
@@ -83,5 +83,34 @@ class AppUpdateLogicTest {
         assertTrue(ready.file.exists())
 
         tempApk.delete()
+    }
+
+    @Test
+    fun testModifiedOrderSmsMessageFormatting() {
+        val order = com.example.data.model.TShirtOrder(
+            id = 1L,
+            orderId = "7K2B9X",
+            customerName = "প্রীতম বিশ্বাস",
+            mobileNumber = "01711223344",
+            qtyL = 2,
+            qtyM = 1,
+            totalQuantity = 3,
+            unitPrice = 350.0,
+            totalAmount = 1050.0,
+            trackingUrl = "https://podderpara.shop/track/7K2B9X"
+        )
+
+        val sms = com.example.sms.SmsGatewayManager.generateBengaliOrderModifiedSmsMessage(
+            order = order,
+            storeName = "পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির"
+        )
+
+        assertTrue(sms.contains("প্রীতম বিশ্বাস"))
+        assertTrue(sms.contains("#7K2B9X"))
+        assertTrue(sms.contains("হালনাগাদ/সংশোধন"))
+        assertTrue(sms.contains("L: 2"))
+        assertTrue(sms.contains("M: 1"))
+        assertTrue(sms.contains("1050"))
+        assertTrue(sms.contains("https://podderpara.shop/track/7K2B9X"))
     }
 }

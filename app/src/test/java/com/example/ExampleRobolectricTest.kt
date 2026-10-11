@@ -55,4 +55,18 @@ class ExampleRobolectricTest {
     assertEquals(7, generatedId.length)
     org.junit.Assert.assertTrue(com.example.data.model.TShirtOrder.isValidOrderId(generatedId))
   }
+
+  @Test
+  fun `verify order total calculation`() {
+    val form = com.example.ui.NewOrderFormState(
+      customerName = "বিপ্লব রায়",
+      mobileNumber = "01812345678",
+      unitPrice = 350.0,
+      qtyM = 2,
+      qtyL = 1
+    )
+    assertEquals(3, form.totalQuantity)
+    assertEquals(1050.0, form.totalAmount, 0.01)
+    org.junit.Assert.assertTrue(form.isValid)
+  }
 }

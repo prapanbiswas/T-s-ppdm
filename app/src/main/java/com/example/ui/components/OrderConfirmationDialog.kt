@@ -37,6 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import com.example.data.model.TShirtOrder
 import com.example.ui.NewOrderFormState
 import com.example.ui.theme.AppBackground
 import com.example.ui.theme.AppBorder
@@ -55,6 +61,8 @@ fun OrderConfirmationDialog(
     formState: NewOrderFormState,
     isOnline: Boolean,
     autoSendSms: Boolean,
+    existingOrder: TShirtOrder? = null,
+    onModifyExistingOrder: ((TShirtOrder) -> Unit)? = null,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -195,6 +203,93 @@ fun OrderConfirmationDialog(
                                     fontSize = 13.sp,
                                     color = AppTextSecondary
                                 )
+                            }
+                        }
+                    }
+
+                    // Existing Order Notice if duplicate phone
+                    if (existingOrder != null) {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFFFFF7ED),
+                            border = BorderStroke(1.dp, Color(0xFFF97316).copy(alpha = 0.5f)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.WarningAmber,
+                                            contentDescription = null,
+                                            tint = Color(0xFFEA580C),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Existing Order #${existingOrder.orderId} Found",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF9A3412)
+                                        )
+                                    }
+
+                                    Surface(
+                                        color = Color(0xFFFED7AA),
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text(
+                                            text = "${existingOrder.totalQuantity} pcs • ${CurrencyUtils.formatTaka(existingOrder.totalAmount)}",
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF9A3412),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+
+                                Text(
+                                    text = "You are creating an additional order for this number. If you wanted to modify the earlier order instead, click below:",
+                                    fontSize = 10.sp,
+                                    color = Color(0xFF7C2D12),
+                                    lineHeight = 14.sp
+                                )
+
+                                if (onModifyExistingOrder != null) {
+                                    OutlinedButton(
+                                        onClick = { onModifyExistingOrder(existingOrder) },
+                                        shape = RoundedCornerShape(8.dp),
+                                        border = BorderStroke(1.dp, Color(0xFFEA580C)),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF9A3412)),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(34.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(13.dp),
+                                            tint = Color(0xFF9A3412)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Modify Order #${existingOrder.orderId} Instead",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF9A3412)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

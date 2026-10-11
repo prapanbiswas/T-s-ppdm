@@ -96,6 +96,29 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     private val _editingOrder = MutableStateFlow<TShirtOrder?>(null)
     val editingOrder: StateFlow<TShirtOrder?> = _editingOrder.asStateFlow()
 
+    // Active Celebration Dialog State for newly placed order
+    private val _celebrationOrderId = MutableStateFlow<Long?>(null)
+    val celebrationOrderId: StateFlow<Long?> = _celebrationOrderId.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val celebrationOrder: StateFlow<TShirtOrder?> = _celebrationOrderId
+        .flatMapLatest { id ->
+            if (id != null) {
+                database.tshirtOrderDao().getOrderById(id)
+            } else {
+                kotlinx.coroutines.flow.flowOf(null)
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    fun dismissCelebration() {
+        _celebrationOrderId.value = null
+    }
+
     // Store & Dispatch Settings (Temple Branding)
     private val _storeName = MutableStateFlow(
         prefs.getString("store_name", null).let {
@@ -174,6 +197,84 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = repository.calculateDataSheetSummary(emptyList())
         )
 
+    // User-acknowledged duplicate phone if they explicitly wish to create another order for the same number
+    private val _acknowledgedDuplicatePhone = MutableStateFlow<String?>(null)
+
+    // Detect if an active existing order already exists for the entered mobile number
+    val existingOrderForEnteredPhone: StateFlow<TShirtOrder?> = combine(
+        _formState,
+        allOrdersForSummary,
+        _acknowledgedDuplicatePhone
+    ) { form, allOrders, acknowledgedPhone ->
+        val cleanEntered = form.mobileNumber.replace(Regex("[^0-9]"), "")
+        if (cleanEntered.length >= 8 && cleanEntered != acknowledgedPhone) {
+            allOrders.firstOrNull { order ->
+                val cleanExisting = order.mobileNumber.replace(Regex("[^0-9]"), "")
+                val match = cleanExisting.isNotEmpty() &&
+                    (cleanExisting == cleanEntered ||
+                     (cleanEntered.length >= 10 && cleanExisting.endsWith(cleanEntered.takeLast(10))) ||
+                     (cleanExisting.length >= 10 && cleanEntered.endsWith(cleanExisting.takeLast(10))))
+                match && order.status != OrderStatus.CANCELLED
+            }
+        } else {
+            null
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    // State indicating if the user has clicked to allow creating another order for this duplicate phone
+    val isDuplicatePhoneAcknowledged: StateFlow<Boolean> = combine(
+        _formState,
+        _acknowledgedDuplicatePhone
+    ) { form, ackPhone ->
+        val clean = form.mobileNumber.replace(Regex("[^0-9]"), "")
+        clean.isNotEmpty() && clean == ackPhone
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
+    // Any existing order regardless of acknowledgment (for confirmation reminder)
+    val anyExistingOrderForEnteredPhone: StateFlow<TShirtOrder?> = combine(
+        _formState,
+        allOrdersForSummary
+    ) { form, allOrders ->
+        val cleanEntered = form.mobileNumber.replace(Regex("[^0-9]"), "")
+        if (cleanEntered.length >= 8) {
+            allOrders.firstOrNull { order ->
+                val cleanExisting = order.mobileNumber.replace(Regex("[^0-9]"), "")
+                val match = cleanExisting.isNotEmpty() &&
+                    (cleanExisting == cleanEntered ||
+                     (cleanEntered.length >= 10 && cleanExisting.endsWith(cleanEntered.takeLast(10))) ||
+                     (cleanExisting.length >= 10 && cleanEntered.endsWith(cleanExisting.takeLast(10))))
+                match && order.status != OrderStatus.CANCELLED
+            }
+        } else {
+            null
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    fun acknowledgeAndAllowDuplicateOrder() {
+        val clean = _formState.value.mobileNumber.replace(Regex("[^0-9]"), "")
+        _acknowledgedDuplicatePhone.value = clean
+    }
+
+    fun modifyExistingOrderFromNewOrder(order: TShirtOrder) {
+        startEditingOrder(order)
+    }
+
+    fun prefillNameFromExistingOrder(name: String) {
+        _formState.value = _formState.value.copy(customerName = name)
+    }
+
     // Form Actions
     fun updateCustomerName(name: String) {
         _formState.value = _formState.value.copy(customerName = name)
@@ -181,6 +282,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateMobileNumber(phone: String) {
         _formState.value = _formState.value.copy(mobileNumber = phone)
+        val clean = phone.replace(Regex("[^0-9]"), "")
+        if (clean != _acknowledgedDuplicatePhone.value) {
+            _acknowledgedDuplicatePhone.value = null
+        }
     }
 
     fun updateUnitPrice(price: Double) {
@@ -255,7 +360,11 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
                 note = form.note
             )
 
-            // Reset form
+            // Trigger celebration pop-up with animated tick & live SMS tracking
+            _celebrationOrderId.value = savedOrder.id
+
+            // Reset form and duplicate phone state
+            _acknowledgedDuplicatePhone.value = null
             _formState.value = NewOrderFormState(unitPrice = form.unitPrice)
             _showConfirmationDialog.value = false
             onSuccess(savedOrder)
@@ -273,15 +382,19 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Background SMS dispatch worker (enqueued via WorkManager for reliable background execution)
      */
-    fun dispatchSmsForOrder(order: TShirtOrder) {
+    fun dispatchSmsForOrder(order: TShirtOrder, isUpdate: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateSmsStatus(order.id, SmsStatus.SENDING)
-            com.example.sms.OrderSmsWorker.enqueue(getApplication(), order.id)
+            com.example.sms.OrderSmsWorker.enqueue(getApplication(), order.id, isUpdate)
         }
     }
 
     fun resendOrderSms(order: TShirtOrder) {
-        dispatchSmsForOrder(order)
+        dispatchSmsForOrder(order, isUpdate = false)
+    }
+
+    fun resendOrderModifiedSms(order: TShirtOrder) {
+        dispatchSmsForOrder(order, isUpdate = true)
     }
 
     // Search & Filter Actions
@@ -324,6 +437,22 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.updateOrder(updatedOrder)
             _editingOrder.value = null
+
+            // Instantly dispatch notification SMS to customer about modified order details & price
+            if (_autoSendSms.value) {
+                dispatchSmsForOrder(updatedOrder, isUpdate = true)
+            }
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    getApplication(),
+                    "অর্ডার #${updatedOrder.orderId} পরিবর্তন সংরক্ষিত ও গ্রাহককে SMS পাঠানো হয়েছে",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            // Enqueue cloud sync
+            com.example.sync.FirebaseSyncWorker.enqueue(getApplication())
         }
     }
 
@@ -405,6 +534,17 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
             type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, "Share Order #${order.orderId}")
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(shareIntent)
+    }
+
+    fun shareModifiedOrderSms(context: Context, order: TShirtOrder) {
+        val message = SmsGatewayManager.generateBengaliOrderModifiedSmsMessage(order, _storeName.value)
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, message)
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, "Share Modified Order #${order.orderId}")
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(shareIntent)
     }

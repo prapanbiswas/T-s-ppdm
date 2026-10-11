@@ -26,6 +26,7 @@ class OrderSmsWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val orderDbId = inputData.getLong(KEY_ORDER_DB_ID, -1L)
+        val isUpdate = inputData.getBoolean(KEY_IS_UPDATE, false)
         if (orderDbId <= 0) {
             Log.e(TAG, "OrderSmsWorker aborted: Invalid order ID ($orderDbId)")
             return@withContext Result.failure()
@@ -45,7 +46,7 @@ class OrderSmsWorker(
         val storeName = prefs.getString("store_name", "পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির") ?: "পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির"
         val selectedSimId = prefs.getInt("selected_sim_id", -1)
 
-        Log.d(TAG, "Worker waking up for Order #${order.orderId}, recipient: ${order.mobileNumber}, SIM Sub: $selectedSimId")
+        Log.d(TAG, "Worker waking up for Order #${order.orderId} (isUpdate=$isUpdate), recipient: ${order.mobileNumber}, SIM Sub: $selectedSimId")
 
         // Mark as SENDING
         orderDao.updateSmsStatus(
@@ -61,7 +62,8 @@ class OrderSmsWorker(
             context = applicationContext,
             order = order,
             storeName = storeName,
-            selectedSubscriptionId = selectedSimId
+            selectedSubscriptionId = selectedSimId,
+            isUpdate = isUpdate
         )
 
         return@withContext when (result) {
@@ -87,25 +89,33 @@ class OrderSmsWorker(
     companion object {
         private const val TAG = "OrderSmsWorker"
         const val KEY_ORDER_DB_ID = "order_db_id"
+        const val KEY_IS_UPDATE = "is_order_update"
 
         /**
-         * Enqueues the background worker to dispatch the order confirmation SMS.
+         * Enqueues the background worker to dispatch the order confirmation or modification SMS.
          */
-        fun enqueue(context: Context, orderDbId: Long) {
+        fun enqueue(context: Context, orderDbId: Long, isUpdate: Boolean = false) {
             val inputData = Data.Builder()
                 .putLong(KEY_ORDER_DB_ID, orderDbId)
+                .putBoolean(KEY_IS_UPDATE, isUpdate)
                 .build()
 
             val workRequest = OneTimeWorkRequestBuilder<OrderSmsWorker>()
                 .setInputData(inputData)
                 .build()
 
+            val workName = if (isUpdate) {
+                "sms_dispatch_order_${orderDbId}_mod_${System.currentTimeMillis()}"
+            } else {
+                "sms_dispatch_order_$orderDbId"
+            }
+
             WorkManager.getInstance(context).enqueueUniqueWork(
-                "sms_dispatch_order_$orderDbId",
+                workName,
                 ExistingWorkPolicy.REPLACE,
                 workRequest
             )
-            Log.d(TAG, "Enqueued background OrderSmsWorker for order #$orderDbId")
+            Log.d(TAG, "Enqueued background OrderSmsWorker for order #$orderDbId (isUpdate=$isUpdate)")
         }
     }
 }

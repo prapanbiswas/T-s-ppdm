@@ -65,6 +65,17 @@ object AppUpdateManager {
     }
 
     /**
+     * Checks if any previously downloaded update APK file exists in downloads directory.
+     */
+    fun getAnyDownloadedUpdateApk(context: Context): File? {
+        val targetDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
+        val files = targetDir.listFiles { file ->
+            file.name.endsWith(".apk") && file.length() > 1024
+        } ?: return null
+        return files.maxByOrNull { it.lastModified() }
+    }
+
+    /**
      * Checks for new updates from GitHub Releases API or version metadata.
      */
     suspend fun checkForUpdates(
@@ -156,19 +167,20 @@ object AppUpdateManager {
     }
 
     /**
-     * Triggers a simulated test update (e.g. v1.1) to test the in-app download and installation experience.
+     * Triggers a simulated test update (e.g. v1.3) to test the in-app download and installation experience.
      */
-    fun triggerSimulatedUpdate(context: Context, targetVersion: String = "1.1") {
+    fun triggerSimulatedUpdate(context: Context, targetVersion: String = "1.3") {
         val existingFile = getDownloadedApkFile(context, targetVersion)
         val info = UpdateInfo(
-            versionCode = 2,
+            versionCode = 4,
             versionName = targetVersion,
             downloadUrl = "https://github.com/$githubRepo/releases/download/v$targetVersion/PodderparaDurgaMandir-v$targetVersion.apk",
             releaseNotes = """
                 🎉 শারদীয় দুর্গোৎসব অ্যাপ নতুন আপডেট v$targetVersion:
                 • সহজ ও স্পষ্ট ২-মোড পিডিএফ জেনারেশন (অর্ডার শীট ও সাবটোটাল)
                 • কারখানা কাটিং ও সেলাই চেকলিস্ট
-                • স্বয়ংক্রিয় সংস্করণ আপডেট ও ব্যাকআপ সুবিধা
+                • এডিট অর্ডারের সাথে সাথে স্বয়ংক্রিয় SMS নোটিফিকেশন
+                • হালনাগাদ মন্দির অফিশিয়াল লোগো ও উন্নত ইউজার ইন্টারফেস
             """.trimIndent(),
             fileSize = 18_500_000L,
             isSimulation = true

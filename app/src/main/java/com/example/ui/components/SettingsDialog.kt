@@ -487,8 +487,9 @@ fun SettingsDialog(
                         )
 
                         // Check if a downloaded APK already exists locally!
-                        val existingApk = AppUpdateManager.getDownloadedApkFile(context, "1.1")
+                        val existingApk = AppUpdateManager.getAnyDownloadedUpdateApk(context)
                         if (existingApk != null) {
+                            val apkLabel = existingApk.name.removePrefix("PodderparaDurgaMandir-").removeSuffix(".apk")
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = BrandSuccess.copy(alpha = 0.1f),
@@ -502,7 +503,7 @@ fun SettingsDialog(
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = "✅ v1.1 APK ডাউনলোড করা আছে",
+                                            text = "✅ $apkLabel APK ডাউনলোড করা আছে",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 11.5.sp,
                                             color = BrandSuccess
@@ -541,9 +542,9 @@ fun SettingsDialog(
                             )
 
                             SleekOutlinedButton(
-                                text = "টেস্ট সিমুলেশন (v1.1)",
+                                text = "টেস্ট সিমুলেশন (v1.3)",
                                 onClick = {
-                                    AppUpdateManager.triggerSimulatedUpdate(context, "1.1")
+                                    AppUpdateManager.triggerSimulatedUpdate(context, "1.3")
                                 },
                                 modifier = Modifier.weight(1f),
                                 testTag = "simulate_update_btn"

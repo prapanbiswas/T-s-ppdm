@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -45,6 +46,10 @@ import com.example.ui.theme.AppTextPrimary
 import com.example.ui.theme.AppTextSecondary
 import com.example.ui.theme.BrandDark
 import com.example.ui.theme.BrandPrimary
+import com.example.ui.theme.MandirCrimson
+import com.example.ui.theme.MandirCrimsonBorder
+import com.example.ui.theme.MandirCrimsonLight
+import com.example.ui.theme.MandirGoldBorder
 import com.example.util.CurrencyUtils
 
 @Composable
@@ -167,24 +172,72 @@ fun EditOrderDialog(
                         color = BrandDark,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(14.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "সর্বমোট: $totalQty পিস (T-Shirts)",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.5.sp,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = CurrencyUtils.formatTaka(totalAmount),
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 17.sp,
+                                    color = MandirGoldBorder
+                                )
+                            }
+                            if (totalQty > 0) {
+                                val summaryParts = mutableListOf<String>()
+                                if (qtyChild12 > 0) summaryParts.add("Child: $qtyChild12")
+                                if (qtyS > 0) summaryParts.add("S: $qtyS")
+                                if (qtyM > 0) summaryParts.add("M: $qtyM")
+                                if (qtyL > 0) summaryParts.add("L: $qtyL")
+                                if (qtyXL > 0) summaryParts.add("XL: $qtyXL")
+                                if (qtyXXL > 0) summaryParts.add("2XL: $qtyXXL")
+                                if (qtyXXXL > 0) summaryParts.add("3XL: $qtyXXXL")
+                                Text(
+                                    text = "সাইজ: ${summaryParts.joinToString(" • ")}",
+                                    fontSize = 11.sp,
+                                    color = Color.White.copy(alpha = 0.85f)
+                                )
+                            }
+                        }
+                    }
+
+                    // SMS Instant Dispatch Banner
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = MandirCrimsonLight,
+                        border = BorderStroke(1.dp, MandirCrimsonBorder),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "TOTAL: $totalQty PCS",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = Color.White
+                            Icon(
+                                imageVector = Icons.Default.Sms,
+                                contentDescription = null,
+                                tint = MandirCrimson,
+                                modifier = Modifier.size(18.dp)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = CurrencyUtils.formatTaka(totalAmount),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                color = Color.White
+                                text = "সংরক্ষণ করলেই গ্রাহকের নম্বরে নতুন সাইজ ও হালনাগাদ মোট মূল্যের SMS নোটিফিকেশন স্বয়ংক্রিয়ভাবে চলে যাবে।",
+                                fontSize = 11.sp,
+                                color = AppTextPrimary,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = 14.5.sp
                             )
                         }
                     }

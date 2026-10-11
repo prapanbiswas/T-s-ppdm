@@ -272,6 +272,8 @@ fun OrderListScreen(
                             onCopyTracking = { viewModel.copyTrackingLink(context, order) },
                             onShareTracking = { viewModel.shareTrackingLink(context, order) },
                             onResendSms = { viewModel.resendOrderSms(order) },
+                            onResendModifiedSms = { viewModel.resendOrderModifiedSms(order) },
+                            onShareModifiedSms = { viewModel.shareModifiedOrderSms(context, order) },
                             onCancel = { viewModel.cancelOrder(order) },
                             onDelete = { orderToDelete = order }
                         )
@@ -345,15 +347,6 @@ fun OrderListScreen(
         }
     }
 
-    // Edit Order Dialog
-    editingOrder?.let { order ->
-        EditOrderDialog(
-            order = order,
-            onSave = { updated -> viewModel.saveEditedOrder(updated) },
-            onDismiss = { viewModel.dismissEditingOrder() }
-        )
-    }
-
     // Delete Confirmation Dialog
     orderToDelete?.let { order ->
         AlertDialog(
@@ -399,6 +392,8 @@ private fun OrderCard(
     onCopyTracking: () -> Unit,
     onShareTracking: () -> Unit,
     onResendSms: () -> Unit,
+    onResendModifiedSms: () -> Unit,
+    onShareModifiedSms: () -> Unit,
     onCancel: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -465,6 +460,14 @@ private fun OrderCard(
                             onDismissRequest = { menuExpanded = false }
                         ) {
                             DropdownMenuItem(
+                                text = { Text("Edit Order (অর্ডার সম্পাদনা)") },
+                                leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, tint = MandirCrimson) },
+                                onClick = {
+                                    menuExpanded = false
+                                    onEdit()
+                                }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Copy Tracking URL") },
                                 leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
                                 onClick = {
@@ -481,7 +484,7 @@ private fun OrderCard(
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Resend SMS Confirmation") },
+                                text = { Text("Resend Initial SMS") },
                                 leadingIcon = { Icon(Icons.Default.Sms, contentDescription = null) },
                                 onClick = {
                                     menuExpanded = false
@@ -489,11 +492,19 @@ private fun OrderCard(
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Edit Order") },
-                                leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                text = { Text("Send Modified Order SMS") },
+                                leadingIcon = { Icon(Icons.Default.Sms, contentDescription = null, tint = MandirCrimson) },
                                 onClick = {
                                     menuExpanded = false
-                                    onEdit()
+                                    onResendModifiedSms()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Share Modified Order SMS") },
+                                leadingIcon = { Icon(Icons.Default.Share, contentDescription = null, tint = MandirCrimson) },
+                                onClick = {
+                                    menuExpanded = false
+                                    onShareModifiedSms()
                                 }
                             )
                             if (order.status != OrderStatus.CANCELLED) {
@@ -748,30 +759,31 @@ private fun OrderCard(
                 }
             }
 
-            // Quick Actions: Resend SMS & Update Status
+            // Quick Actions: Direct Edit, SMS & Update Status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SleekOutlinedButton(
-                    text = "Share Link",
-                    onClick = onShareTracking,
-                    icon = Icons.Default.Share,
-                    modifier = Modifier.weight(1f)
+                SleekButton(
+                    text = "সম্পাদনা",
+                    onClick = onEdit,
+                    icon = Icons.Default.Edit,
+                    modifier = Modifier.weight(1f),
+                    testTag = "edit_order_btn_${order.orderId}"
                 )
 
                 SleekOutlinedButton(
-                    text = if (order.smsStatus == SmsStatus.FAILED) "Retry SMS" else "Resend SMS",
+                    text = if (order.smsStatus == SmsStatus.FAILED) "Retry SMS" else "SMS পাঠান",
                     onClick = onResendSms,
                     icon = Icons.Default.Sms,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1.05f)
                 )
 
                 SleekOutlinedButton(
-                    text = "Status",
+                    text = "স্ট্যাটাস",
                     onClick = onStatusClick,
                     icon = Icons.Default.SwapHoriz,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.95f)
                 )
             }
         }

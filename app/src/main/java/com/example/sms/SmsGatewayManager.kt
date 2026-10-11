@@ -110,6 +110,42 @@ object SmsGatewayManager {
     }
 
     /**
+     * Formats official customer SMS when an existing order is edited/modified.
+     * Includes updated sizes, updated total quantity, updated price, and live tracking URL.
+     */
+    fun generateBengaliOrderModifiedSmsMessage(order: TShirtOrder, storeName: String = "পোদ্দারপাড়া সর্বজনীন দুর্গা মন্দির"): String {
+        val formattedAmount = if (order.totalAmount % 1.0 == 0.0) {
+            order.totalAmount.toLong().toString()
+        } else {
+            String.format(java.util.Locale.US, "%.2f", order.totalAmount)
+        }
+
+        val sizeParts = mutableListOf<String>()
+        if (order.qtyChild12 > 0) sizeParts.add("Child: ${order.qtyChild12}")
+        if (order.qtyS > 0) sizeParts.add("S: ${order.qtyS}")
+        if (order.qtyM > 0) sizeParts.add("M: ${order.qtyM}")
+        if (order.qtyL > 0) sizeParts.add("L: ${order.qtyL}")
+        if (order.qtyXL > 0) sizeParts.add("XL: ${order.qtyXL}")
+        if (order.qtyXXL > 0) sizeParts.add("2XL: ${order.qtyXXL}")
+        if (order.qtyXXXL > 0) sizeParts.add("3XL: ${order.qtyXXXL}")
+        val sizeBreakdown = if (sizeParts.isNotEmpty()) sizeParts.joinToString(", ") else "0 টি"
+
+        return """
+        শুভ শারদীয়া!
+        প্রিয় ${order.customerName.trim()},
+        $storeName-এর আপনার অর্ডার #${order.orderId} সফলভাবে হালনাগাদ/সংশোধন করা হয়েছে।
+        বর্তমান সাইজ: $sizeBreakdown
+        মোট সংখ্যা: ${order.totalQuantity} টি
+        হালনাগাদ মোট মূল্য: $formattedAmount টাকা
+
+        লাইভ ট্র্যাকিং লিংক:
+        ${order.trackingUrl}
+
+        ধন্যবাদ!
+        """.trimIndent()
+    }
+
+    /**
      * Dispatches the SMS confirmation completely in the background via native SmsManager.
      * Generates multipart SMS and binds explicit PendingIntent broadcast receivers for Sent
      * and Delivery reporting to update the database in real time.
@@ -118,7 +154,8 @@ object SmsGatewayManager {
         context: Context,
         order: TShirtOrder,
         storeName: String,
-        selectedSubscriptionId: Int = -1
+        selectedSubscriptionId: Int = -1,
+        isUpdate: Boolean = false
     ): SmsSendResult = withContext(Dispatchers.IO) {
         if (!hasSmsPermission(context)) {
             val error = "মোবাইলে SMS প্রেরণের পারমিশন দেওয়া নেই (SEND_SMS missing)"
@@ -133,7 +170,11 @@ object SmsGatewayManager {
             return@withContext SmsSendResult.Failure(error)
         }
 
-        val smsText = generateBengaliSmsMessage(order, storeName)
+        val smsText = if (isUpdate) {
+            generateBengaliOrderModifiedSmsMessage(order, storeName)
+        } else {
+            generateBengaliSmsMessage(order, storeName)
+        }
 
         try {
             val smsManager: SmsManager = getTargetSmsManager(context, selectedSubscriptionId)

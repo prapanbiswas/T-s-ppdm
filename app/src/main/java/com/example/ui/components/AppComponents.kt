@@ -504,15 +504,15 @@ fun SleekBrandHeader(
         Box(
             modifier = Modifier
                 .size(42.dp)
-                .background(MandirCrimson, shape = RoundedCornerShape(14.dp))
-                .border(BorderStroke(1.2.dp, MandirGold.copy(alpha = 0.7f)), shape = RoundedCornerShape(14.dp))
-                .padding(6.dp),
+                .background(MandirCrimson, shape = RoundedCornerShape(12.dp))
+                .border(BorderStroke(1.2.dp, MandirGold.copy(alpha = 0.8f)), shape = RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_mandir_logo),
-                contentDescription = "Mandir Emblem",
-                modifier = Modifier.size(30.dp)
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Mandir Official Logo",
+                modifier = Modifier.size(42.dp)
             )
         }
 
